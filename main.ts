@@ -14,7 +14,11 @@ const earlyAccessCodeInput = document.getElementById('early-access-code') as HTM
 const checkCodeBtn = document.getElementById('check-code-btn') as HTMLButtonElement;
 const codeMessage = document.getElementById('code-message') as HTMLParagraphElement;
 
-const API_URL = 'http://<DEINE_SERVER_IP>:3001'; // IP anpassen
+// Admin-Passwort (später besser sichern!)
+const ADMIN_PASSWORD = "deinSicheresPasswort";
+
+// Beispiel Early-Access Codes (später vom Backend)
+const validCodes = ["ABC123", "VIP2025", "GOTHACCESS"];
 
 // Countdown Setup
 const launchDate = new Date('2025-08-01T00:00:00').getTime();
@@ -41,88 +45,44 @@ function updateCountdown() {
 const timer = setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Fortschritt aus Backend laden
-async function loadProgress() {
-  try {
-    const resp = await fetch(`${API_URL}/progress`);
-    const data = await resp.json();
-    updateProgress(data.progress);
-  } catch {
-    updateProgress(0);
-  }
-}
-
-loadProgress();
-
+// Fortschritt initialisieren
 let progress = 0;
 function updateProgress(value: number) {
   progress = Math.min(100, Math.max(0, value));
   progressBar.style.width = progress + '%';
   progressText.textContent = `Fortschritt: ${progress}%`;
 }
+updateProgress(progress);
 
 // Admin Login
 loginBtn.addEventListener('click', () => {
-  // Passwort wird nur fürs Backend gebraucht, daher nur UI wechseln
-  if (adminPassword.value.length > 0) {
+  if (adminPassword.value === ADMIN_PASSWORD) {
     loginSection.style.display = 'none';
     adminSection.style.display = 'block';
     loginMessage.textContent = '';
   } else {
-    loginMessage.textContent = 'Bitte Passwort eingeben!';
+    loginMessage.textContent = 'Falsches Passwort!';
   }
 });
 
-// Fortschritt speichern
-async function saveProgress(value: number, password: string) {
-  try {
-    const resp = await fetch(`${API_URL}/progress`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ progress: value, password })
-    });
-    const data = await resp.json();
-    if (data.success) {
-      updateProgress(value);
-      alert('Fortschritt gespeichert!');
-    } else {
-      alert('Fehler: ' + (data.error || 'Unbekannt'));
-    }
-  } catch {
-    alert('Server nicht erreichbar');
-  }
-}
-
+// Fortschritt updaten
 updateProgressBtn.addEventListener('click', () => {
   const newValue = Number(progressInput.value);
   if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
-    saveProgress(newValue, adminPassword.value);
+    updateProgress(newValue);
+    // TODO: Später Backend-API aufrufen, um Wert zu speichern
   } else {
     alert('Bitte eine Zahl zwischen 0 und 100 eingeben.');
   }
 });
 
 // Early Access Code prüfen
-checkCodeBtn.addEventListener('click', async () => {
+checkCodeBtn.addEventListener('click', () => {
   const code = earlyAccessCodeInput.value.trim();
-  if (code.length === 0) {
-    codeMessage.textContent = "Bitte Code eingeben.";
-    return;
-  }
-  try {
-    const resp = await fetch(`${API_URL}/check-code`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ code })
-    });
-    const data = await resp.json();
-    if (data.valid) {
-      codeMessage.textContent = "Code gültig! Du hast Early Access.";
-      // Hier kannst du noch spezielle Inhalte freischalten
-    } else {
-      codeMessage.textContent = "Ungültiger Code.";
-    }
-  } catch {
-    codeMessage.textContent = "Server nicht erreichbar.";
+  if (validCodes.includes(code)) {
+    codeMessage.textContent = "Code gültig! Du hast Early Access.";
+    // Optional: Hier besondere Inhalte freischalten
+  } else {
+    codeMessage.textContent = "Ungültiger Code.";
   }
 });
