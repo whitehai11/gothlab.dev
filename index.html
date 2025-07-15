@@ -13,7 +13,31 @@
   <main>
     <h1 id="headline">GothLab ist bald da!</h1>
     <p id="countdown">Wir sind fast bereit...</p>
+
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+    <p id="progress-text">Fortschritt: 0%</p>
+
     <img src="c1ea3a2f-929a-470d-aac8-391e941a6bd9.png" alt="GothLab Logo" class="logo" />
+
+    <div id="admin-section" style="display:none;">
+      <input type="number" id="progress-input" min="0" max="100" placeholder="Neuen Fortschritt eingeben (%)" />
+      <button id="update-progress-btn">Update Fortschritt</button>
+    </div>
+
+    <div id="login-section">
+      <input type="password" id="admin-password" placeholder="Admin-Passwort" />
+      <button id="login-btn">Login</button>
+      <p id="login-message"></p>
+    </div>
+
+    <div id="early-access-section">
+      <input type="text" id="early-access-code" placeholder="Early Access Code eingeben" />
+      <button id="check-code-btn">Code prüfen</button>
+      <p id="code-message"></p>
+    </div>
+
   </main>
 
   <script src="dist/main.js"></script>
